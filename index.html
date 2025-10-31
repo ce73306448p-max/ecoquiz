@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🌱 생태와 환경 퀴즈</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="quiz-container">
+    <h1>🌿 생태와 환경 퀴즈</h1>
+    <div id="quiz-box">
+      <div id="question"></div>
+      <div id="choices"></div>
+      <button id="next-btn">다음 문제</button>
+    </div>
+    <div id="result" class="hidden">
+      <h2>결과</h2>
+      <p id="score"></p>
+      <button id="restart-btn">다시하기</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+body {
+  font-family: "Pretendard", sans-serif;
+  background-color: #eaf5e3;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.quiz-container {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  width: 90%;
+  max-width: 500px;
+  padding: 30px;
+  text-align: center;
+}
+
+h1 {
+  color: #3b7a57;
+  margin-bottom: 20px;
+}
+
+#question {
+  font-size: 1.2em;
+  margin-bottom: 15px;
+}
+
+#choices button {
+  display: block;
+  width: 100%;
+  margin: 8px 0;
+  padding: 12px;
+  border: 2px solid #3b7a57;
+  border-radius: 10px;
+  background: white;
+  color: #3b7a57;
+  font-size: 1em;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+#choices button:hover {
+  background-color: #3b7a57;
+  color: white;
+}
+
+#next-btn, #restart-btn {
+  margin-top: 15px;
+  padding: 10px 20px;
+  border: none;
+  background-color: #6abe83;
+  color: white;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1em;
+}
+
+.hidden {
+  display: none;
+}
+const quizData = [
+  {
+    question: "1. 지구 평균 온도가 상승하는 현상을 무엇이라 하나요?",
+    choices: ["빙하기", "지구온난화", "오존층파괴", "지진"],
+    answer: "지구온난화"
+  },
+  {
+    question: "2. 온실가스 중 가장 많은 비중을 차지하는 것은?",
+    choices: ["메탄", "아산화질소", "이산화탄소", "프레온가스"],
+    answer: "이산화탄소"
+  },
+  {
+    question: "3. 플라스틱 쓰레기 문제를 줄이기 위한 가장 효과적인 방법은?",
+    choices: ["소각", "매립", "재활용 및 감량", "바다에 버리기"],
+    answer: "재활용 및 감량"
+  },
+  {
+    question: "4. 생태계의 생산자는 주로 어떤 생물인가요?",
+    choices: ["동물", "세균", "식물", "곰팡이"],
+    answer: "식물"
+  },
+  {
+    question: "5. ‘탄소중립’이란 무엇을 의미하나요?",
+    choices: ["탄소를 완전히 제거함", "탄소 배출을 0으로 줄임", "배출한 만큼 흡수함", "탄소를 저장함"],
+    answer: "배출한 만큼 흡수함"
+  },
+  {
+    question: "6. 멸종 위기 동물을 보호하기 위한 국제 협약은?",
+    choices: ["CITES", "WHO", "UNESCO", "IMF"],
+    answer: "CITES"
+  },
+  {
+    question: "7. 미세먼지의 주요 발생 원인은?",
+    choices: ["공장과 자동차 배출가스", "나무 성장", "바다 증발", "비행기 구름"],
+    answer: "공장과 자동차 배출가스"
+  },
+  {
+    question: "8. 해양 생태계를 위협하는 대표적 오염물질은?",
+    choices: ["종이", "플라스틱", "모래", "유리"],
+    answer: "플라스틱"
+  },
+  {
+    question: "9. 산성비의 주요 원인은?",
+    choices: ["이산화탄소와 질소", "이산화황과 질소산화물", "산소와 수소", "메탄과 수증기"],
+    answer: "이산화황과 질소산화물"
+  },
+  {
+    question: "10. 생물다양성이 높다는 것은?",
+    choices: ["한 종만 사는 것", "많은 종이 고르게 존재하는 것", "식물만 많은 것", "동물만 많은 것"],
+    answer: "많은 종이 고르게 존재하는 것"
+  }
+];
+
+let currentQuestion = 0;
+let score = 0;
+
+const questionEl = document.getElementById("question");
+const choicesEl = document.getElementById("choices");
+const nextBtn = document.getElementById("next-btn");
+const resultEl = document.getElementById("result");
+const quizBox = document.getElementById("quiz-box");
+const scoreEl = document.getElementById("score");
+const restartBtn = document.getElementById("restart-btn");
+
+function loadQuestion() {
+  const current = quizData[currentQuestion];
+  questionEl.textContent = current.question;
+  choicesEl.innerHTML = "";
+  current.choices.forEach(choice => {
+    const btn = document.createElement("button");
+    btn.textContent = choice;
+    btn.addEventListener("click", selectAnswer);
+    choicesEl.appendChild(btn);
+  });
+}
+
+function selectAnswer(e) {
+  const selected = e.target.textContent;
+  const correct = quizData[currentQuestion].answer;
+  if (selected === correct) {
+    e.target.style.backgroundColor = "#6abe83";
+    e.target.style.color = "white";
+    score++;
+  } else {
+    e.target.style.backgroundColor = "#e57373";
+    e.target.style.color = "white";
+  }
+  Array.from(choicesEl.children).forEach(btn => btn.disabled = true);
+}
+
+nextBtn.addEventListener("click", () => {
+  currentQuestion++;
+  if (currentQuestion < quizData.length) {
+    loadQuestion();
+  } else {
+    showResult();
+  }
+});
+
+function showResult() {
+  quizBox.classList.add("hidden");
+  resultEl.classList.remove("hidden");
+  scoreEl.textContent = `당신의 점수는 ${score} / ${quizData.length} 입니다!`;
+}
+
+restartBtn.addEventListener("click", () => {
+  currentQuestion = 0;
+  score = 0;
+  quizBox.classList.remove("hidden");
+  resultEl.classList.add("hidden");
+  loadQuestion();
+});
+
+loadQuestion();
